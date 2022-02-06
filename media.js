@@ -30,7 +30,7 @@ app.post('/test', type, function (req, res) {
     if (err) console.log('ERROR: ' + err);
   });
 
-  const process = child_process.exec('docker exec 5ee787688520 python example_docker_postgres.py mp3/' + req.file.originalname, function (error, stdout, stderr) {
+  const process = child_process.exec('docker exec 5b660c95863d python example_docker_postgres.py mp3/' + req.file.originalname, function (error, stdout, stderr) {
 
     if (error) throw error;
 

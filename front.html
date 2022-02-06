@@ -14,8 +14,27 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <link rel="icon" type="image/ico" href="https://markjivko.com/favicon.ico">
     <style type="text/css">
+        .bg-gra {
+            animation: gradient 5s ease infinite;
+        }
+
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
         body {
-            position: absolute;
+            background: linear-gradient(-45deg, #b30003, purple, #23a6d5, green);
+            background-size: 400% 400%;
             display: -webkit-box;
             display: -webkit-flex;
             display: -ms-flexbox;
@@ -170,12 +189,17 @@
                                         return response.json();
                                     })
                                     .then((data) => {
-                                        console.log(JSON.stringify(data))
+                                        var result = JSON.stringify(data)
+                                        var text = result.split("'")
+                                        console.log(text[15])
+                                        $('[data-role="controls"] > button').attr('data-recording', '');
+                                        $('#state').toggle(50)
+                                        $('#state').text(text[15]).toggle(1000);
+                                        $('body').removeClass('bg-gra');
                                     })
                                     .catch((error) => {
                                         console.error('Error:', error);
                                     });
-
                             });
                         }
                     }
@@ -189,13 +213,25 @@
             $('[data-role="controls"] > button').click(function () {
                 // Initialize the recorder
                 myRecorder.init();
-                $(this).attr('data-recording', 'true');
-                myRecorder.start();
+
+                var buttonState = !!$(this).attr('data-recording');
+
+                if (!buttonState) {
+                    $(this).attr('data-recording', 'true');
+                    myRecorder.start();
+                    if ($('#state').css('display') == 'inline-block') {
+                        $('#state').toggle();
+                        $('#state').text('Listening').toggle(1000);
+                    }
+                    else {
+                        $('#state').text('Listening').toggle(1000);
+                    }
+                    $('body').addClass('bg-gra')
+                }
 
                 setTimeout(function () {
-                    $(this).attr('data-recording', '');
                     myRecorder.stop(listObject);
-                }, 3000);
+                }, 2000);
 
             });
         });
@@ -203,12 +239,20 @@
 </head>
 
 <body>
-    <div class="holder">
+
+    <div style="margin-top: 10%;" class="holder">
         <div data-role="controls">
             <button>Record</button>
         </div>
         <div data-role="recordings"></div>
     </div>
+
+    <div style="position:absolute; margin-top: 40%; font-size: xx-large;">
+        <h1>
+            <b id="state" style="display: inline-block; margin-left: 50px; margin-right:50px;">Click for matching</b>
+        </h1>
+    </div>
+
 </body>
 
 </html>

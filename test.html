@@ -1,214 +1,323 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <title>Tutorial &gt; Audio Recorder</title>
-    <link rel="canonical" href="https://markjivko.com/tutorials/B3wWIsNHPk4/">
     <meta charset="UTF-8">
-    <meta name="Author" content="Mark Jivko">
-    <meta name="Keywords" content="js,audio recorder">
-    <meta name="Description" content="Recording audio with HTML 5 and JavaScript">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="viewport" content="initial-scale=1.0, width=device-width">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <link rel="icon" type="image/ico" href="https://markjivko.com/favicon.ico">
-    <style type="text/css">
-        body {
-            position: absolute;
-            display: -webkit-box;
-            display: -webkit-flex;
-            display: -ms-flexbox;
-            display: flex;
-            -webkit-box-pack: center;
-            -webkit-justify-content: center;
-            -ms-flex-pack: center;
-            justify-content: center;
-            -webkit-box-align: center;
-            -webkit-align-items: center;
-            -ms-flex-align: center;
-            align-items: center;
-            height: 100%;
-            width: 100%;
-            margin: 0;
-        }
-
-        .holder {
-            background-color: #4c474c;
-            background-image: -webkit-gradient(linear, left bottom, left top, from(#4c474c), to(#141414));
-            background-image: -o-linear-gradient(bottom, #4c474c 0%, #141414 100%);
-            background-image: linear-gradient(0deg, #4c474c 0%, #141414 100%);
-            border-radius: 50px;
-        }
-
-        [data-role="controls"]>button {
-            margin: 50px auto;
-            outline: none;
-            display: block;
-            border: none;
-            background-color: #D9AFD9;
-            background-image: -webkit-gradient(linear, left bottom, left top, from(#D9AFD9), to(#d3e197));
-            background-image: -o-linear-gradient(bottom, #D9AFD9 0%, #97D9E1 100%);
-            background-image: linear-gradient(0deg, #D9AFD9 0%, #97D9E1 100%);
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            text-indent: -1000em;
-            cursor: pointer;
-            -webkit-box-shadow: 0px 5px 5px 2px rgba(0, 0, 0, 0.3) inset,
-                0px 0px 0px 30px #fff, 0px 0px 0px 35px #333;
-            box-shadow: 0px 5px 5px 2px rgba(0, 0, 0, 0.3) inset,
-                0px 0px 0px 30px #fff, 0px 0px 0px 35px #333;
-        }
-
-        [data-role="controls"]>button:hover {
-            background-color: #ee7bee;
-            background-image: -webkit-gradient(linear, left bottom, left top, from(#ee7bee), to(#6fe1f5));
-            background-image: -o-linear-gradient(bottom, #ee7bee 0%, #6fe1f5 100%);
-            background-image: linear-gradient(0deg, #ee7bee 0%, #6fe1f5 100%);
-        }
-
-        [data-role="controls"]>button[data-recording="true"] {
-            background-color: #ff2038;
-            background-image: -webkit-gradient(linear, left bottom, left top, from(#ff2038), to(#b30003));
-            background-image: -o-linear-gradient(bottom, #ff2038 0%, #b30003 100%);
-            background-image: linear-gradient(0deg, #ff2038 0%, #b30003 100%);
-        }
-
-        [data-role="recordings"]>.row {
-            width: auto;
-            height: auto;
-            padding: 20px;
-        }
-
-        [data-role="recordings"]>.row>audio {
-            outline: none;
-        }
-
-        [data-role="recordings"]>.row>a {
-            display: inline-block;
-            text-align: center;
-            font-size: 20px;
-            line-height: 50px;
-            vertical-align: middle;
-            width: 50px;
-            height: 50px;
-            border-radius: 20px;
-            color: #fff;
-            font-weight: bold;
-            text-decoration: underline;
-            background-color: #0093E9;
-            background-image: -webkit-gradient(linear, left bottom, left top, from(#0093E9), to(#80D0C7));
-            background-image: -o-linear-gradient(bottom, #0093E9 0%, #80D0C7 100%);
-            background-image: linear-gradient(0deg, #0093E9 0%, #80D0C7 100%);
-            float: right;
-            margin-left: 20px;
-            cursor: pointer;
-        }
-
-        [data-role="recordings"]>.row>a:hover {
-            text-decoration: none;
-        }
-
-        [data-role="recordings"]>.row>a:active {
-            background-image: -webkit-gradient(linear, left top, left bottom, from(#0093E9), to(#80D0C7));
-            background-image: -o-linear-gradient(top, #0093E9 0%, #80D0C7 100%);
-            background-image: linear-gradient(180deg, #0093E9 0%, #80D0C7 100%);
-        }
-    </style>
-    <script type="text/javascript" src="https://code.jquery.com/jquery.min.js"></script>
-    <script src="https://markjivko.com/dist/recorder.js"></script>
-    <script>
-        jQuery(document).ready(function () {
-            var $ = jQuery;
-            var myRecorder = {
-                objects: {
-                    context: null,
-                    stream: null,
-                    recorder: null
-                },
-                init: function () {
-                    if (null === myRecorder.objects.context) {
-                        myRecorder.objects.context = new (
-                            window.AudioContext || window.webkitAudioContext
-                        );
-                    }
-                },
-                start: function () {
-                    var options = { audio: true, video: false };
-                    navigator.mediaDevices.getUserMedia(options).then(function (stream) {
-                        myRecorder.objects.stream = stream;
-                        myRecorder.objects.recorder = new Recorder(
-                            myRecorder.objects.context.createMediaStreamSource(stream),
-                            { numChannels: 1 }
-                        );
-                        myRecorder.objects.recorder.record();
-                    }).catch(function (err) { });
-                },
-                stop: function (listObject) {
-                    if (null !== myRecorder.objects.stream) {
-                        myRecorder.objects.stream.getAudioTracks()[0].stop();
-                    }
-                    if (null !== myRecorder.objects.recorder) {
-                        myRecorder.objects.recorder.stop();
-
-                        // Validate object
-                        if (null !== listObject
-                            && 'object' === typeof listObject
-                            && listObject.length > 0) {
-                            // Export the WAV file
-                            myRecorder.objects.recorder.exportWAV(function (blob) {
-                                console.log(myRecorder.objects.recorder)
-                                var fd = new FormData();
-                                fd.append('upl', blob, 'audio' + ".wav");
-
-                                fetch('/test',
-                                    {
-                                        method: 'post',
-                                        body: fd,
-                                    }).then((response) => {
-                                        return response.json();
-                                    })
-                                    .then((data) => {
-                                        console.log(JSON.stringify(data))
-                                    })
-                                    .catch((error) => {
-                                        console.error('Error:', error);
-                                    });
-
-                            });
-                        }
-                    }
-                }
-            };
-
-            // Prepare the recordings list
-            var listObject = $('[data-role="recordings"]');
-
-            // Prepare the record button
-            $('[data-role="controls"] > button').click(function () {
-                // Initialize the recorder
-                myRecorder.init();
-                $(this).attr('data-recording', 'true');
-                myRecorder.start();
-
-                setTimeout(function () {
-                    $(this).attr('data-recording', '');
-                    myRecorder.stop(listObject);
-                }, 3000);
-
-            });
-        });
-    </script>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
 </head>
 
 <body>
-    <div class="holder">
-        <div data-role="controls">
-            <button>Record</button>
-        </div>
-        <div data-role="recordings"></div>
-    </div>
+
+    <style>
+        html {
+            background: #222;
+        }
+
+        body {
+            border-radius: 50%;
+            background: #1d1d1d;
+            padding: 5em;
+            display: block;
+            width: 500px;
+            margin: 5em auto 0;
+
+            border: 1px solid rgba(255, 255, 255, 0.2);
+
+            box-shadow: inset 2px 2px 50px black, 2px 2px 150px rgba(255, 255, 255, 0.1);
+        }
+
+        canvas {
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            box-shadow: inset 0px 0px 120px rgba(255, 255, 255, 0.15),
+                0px 0px 60px rgba(255, 255, 255, 0.04);
+            display: block;
+        }
+
+        .lightningSpot {
+            position: absolute;
+
+            background: radial-gradient(ellipse at center,
+                    rgba(100, 150, 200, 1) 2%,
+                    rgba(100, 150, 200, 0.12) 35%,
+                    rgba(255, 255, 255, 0) 78%,
+                    rgba(255, 255, 255, 0) 100%);
+
+            transform-origin: center center;
+            transform: translate(-50%, -50%);
+        }
+
+        .lightningSpot.small {
+            animation: spotBrightnessSmall 1s infinite;
+        }
+
+        .lightningSpot.large {
+            animation: spotBrightnessLarge 6s infinite;
+        }
+
+        @keyframes spotBrightnessSmall {
+            0% {
+                width: 80px;
+                height: 100px;
+            }
+
+            10% {
+                width: 100px;
+                height: 80px;
+            }
+
+            40% {
+                width: 120px;
+                height: 100px;
+            }
+
+            70% {
+                width: 80px;
+                height: 120px;
+            }
+
+            80% {
+                width: 60px;
+                height: 140px;
+            }
+
+            100% {
+                width: 60px;
+                height: 80px;
+            }
+        }
+
+        @keyframes spotBrightnessLarge {
+            0% {
+                width: 200px;
+                height: 170px;
+            }
+
+            20% {
+                width: 180px;
+                height: 200px;
+            }
+
+            50% {
+                width: 210px;
+                height: 160px;
+            }
+
+            65% {
+                width: 170px;
+                height: 210px;
+            }
+
+            88% {
+                width: 140px;
+                height: 180px;
+            }
+
+            96% {
+                width: 200px;
+                height: 200px;
+            }
+
+            100% {
+                width: 200px;
+                height: 170px;
+            }
+        }
+    </style>
+
+    <script>
+        var turbFactor = 30;
+
+        function turbulence() {
+            return Math.random() * turbFactor - Math.random() * turbFactor;
+        }
+
+        var canvas = document.createElement("canvas"),
+            ctx = canvas.getContext("2d");
+
+        canvas.width = canvas.height = 500;
+        document.body.appendChild(canvas);
+
+        function pt(x, y) {
+            this.x = x;
+            this.y = y;
+
+            this.origX = x;
+            this.origY = y;
+
+            this.draw = function () {
+                var save = ctx.fillStyle;
+
+                ctx.fillStyle = "green";
+                ctx.fillRect(this.x - 2.5, this.y - 2.5, 5, 5);
+
+                ctx.fillStyle = save;
+            };
+        }
+
+        function getAngle(p1, p2) {
+            return (Math.atan2(p2.y - p1.y, p2.x - p1.x) * 180) / Math.PI;
+        }
+
+        function getDistance(p1, p2) {
+            var xs = p2.x - p1.x,
+                ys = p2.y - p1.y;
+
+            return Math.sqrt(xs * xs + ys * ys);
+        }
+
+        function lightning(ANGLE, MAX_LINES, MAX_BENDS) {
+            this.startPoint = new pt(canvas.width / 2, canvas.height / 2);
+
+            this.reline = function () {
+                this.lines = [];
+
+                for (var i = 0, iMax = MAX_LINES || Math.random() * 4; i < iMax; i++) {
+                    var line = [this.startPoint, this.endPoint];
+
+                    for (var j = 0, jMax = MAX_BENDS || Math.random() * 4; j < 2; j++) {
+                        var select = Math.floor(Math.random() * line.length),
+                            select2;
+
+                        if (select > 0 && select < line.length - 1)
+                            select2 = Math.random() > 0.5 ? select - 1 : select + 1;
+                        else {
+                            if (select > 0) select2 = select - 1;
+                            else select2 = select + 1;
+                        }
+
+                        var pt1 = line[select],
+                            pt2 = line[select2];
+
+                        line.push(
+                            new pt(
+                                (pt1.x + pt2.x) / 2 + turbulence() * 2,
+                                (pt1.y + pt2.y) / 2 + turbulence()
+                            )
+                        );
+                    }
+
+                    var opLine = [],
+                        length = line.length;
+
+                    while (opLine.length < length) {
+                        var greatest = [0, 0];
+                        for (var P in line) {
+                            var point = line[P],
+                                dist = getDistance(point, this.endPoint);
+
+                            if (dist > greatest[1]) (greatest[0] = P), (greatest[1] = dist);
+                        }
+
+                        opLine.push(line.splice(greatest[0], 1)[0]);
+                    }
+
+                    this.lines.push(opLine);
+                }
+            };
+
+            this.move = function () {
+                if (this.angle) this.angle += Math.random() * 0.08 - Math.random() * 0.08;
+                else this.angle = Math.random() * 360;
+
+                this.endPoint = new pt(
+                    (Math.cos(this.angle) * canvas.width) / 2 + this.startPoint.x,
+                    Math.sin(this.angle) * (canvas.height / 2) + this.startPoint.y
+                );
+
+                this.reline();
+            };
+
+            this.move();
+
+            this.draw = function () {
+                var _this = this;
+                function drawingPass(W) {
+                    for (var L in _this.lines) {
+                        var line = _this.lines[L];
+
+                        //this.startPoint.draw();
+                        ctx.lineWidth = W || Math.random() * 2 + 1;
+                        ctx.beginPath();
+
+                        ctx.moveTo(_this.startPoint.x, _this.startPoint.y);
+
+                        for (var P in line) {
+                            if (P > 0) {
+                                var point = line[P];
+
+                                ctx.lineTo(point.x, point.y);
+
+                                //point.draw();
+                            }
+                        }
+
+                        ctx.stroke();
+
+                        ctx.closePath();
+                    }
+                }
+
+                ctx.strokeStyle = "rgba(100,150,200, 1)";
+                drawingPass();
+                ctx.strokeStyle = "rgba(100,150,200, .25)";
+                drawingPass(15);
+            };
+        }
+
+        function strikeSpot(num, parent) {
+            this.dom = document.createElement("div");
+
+            this.dom.className = "lightningSpot small";
+
+            document.body.appendChild(this.dom);
+
+            this.update = function () {
+                var p = parent[num].endPoint;
+
+                this.dom.style.left = p.x + canvas.offsetLeft + "px";
+                this.dom.style.top = p.y + canvas.offsetTop + "px";
+            };
+        }
+
+        var bolts = [],
+            strikeSpots = [];
+
+        for (var b = 0, maxB = 5; b < maxB; b++) {
+            bolts.push(new lightning());
+
+            strikeSpots.push(new strikeSpot(b, bolts));
+        }
+
+        var cenSpot = document.createElement("div");
+        cenSpot.className = "lightningSpot large";
+
+        document.body.appendChild(cenSpot);
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            for (var B in bolts) {
+                var bolt = bolts[B];
+
+                bolt.move();
+                bolt.draw();
+            }
+
+            for (var S in strikeSpots) strikeSpots[S].update();
+
+            cenSpot.style.left = canvas.offsetLeft + bolts[0].startPoint.x + "px";
+            cenSpot.style.top = canvas.offsetTop + bolts[0].startPoint.y + "px";
+
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+
+    </script>
+
 </body>
 
 </html>
