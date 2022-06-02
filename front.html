@@ -1,18 +1,11 @@
 <!doctype html>
-<html lang="en">
+<html lang="tr">
 
 <head>
-    <title>Tutorial &gt; Audio Recorder</title>
+    <title>Media Recorder</title>
     <link rel="canonical" href="https://markjivko.com/tutorials/B3wWIsNHPk4/">
-    <meta charset="UTF-8">
-    <meta name="Author" content="Mark Jivko">
-    <meta name="Keywords" content="js,audio recorder">
-    <meta name="Description" content="Recording audio with HTML 5 and JavaScript">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="viewport" content="initial-scale=1.0, width=device-width">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <link rel="icon" type="image/ico" href="https://markjivko.com/favicon.ico">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <style type="text/css">
         .bg-gra {
             animation: gradient 5s ease infinite;
@@ -33,7 +26,7 @@
         }
 
         body {
-            background: linear-gradient(-45deg, #b30003, purple, #23a6d5, green);
+            background: linear-gradient(-90deg, #b30003, orange, rgb(86, 0, 247), rgb(72, 255, 240), purple, rgb(92, 255, 16));
             background-size: 400% 400%;
             display: -webkit-box;
             display: -webkit-flex;
@@ -179,7 +172,7 @@
                             myRecorder.objects.recorder.exportWAV(function (blob) {
                                 console.log(myRecorder.objects.recorder)
                                 var fd = new FormData();
-                                fd.append('upl', blob, 'audio' + ".wav");
+                                fd.append('song', blob, 'audio' + ".wav");
 
                                 fetch('/test',
                                     {
@@ -231,7 +224,7 @@
 
                 setTimeout(function () {
                     myRecorder.stop(listObject);
-                }, 2000);
+                }, 4000);
 
             });
         });
@@ -247,9 +240,10 @@
         <div data-role="recordings"></div>
     </div>
 
-    <div style="position:absolute; margin-top: 40%; font-size: xx-large;">
+    <div style="position:absolute; margin-top: 40%; font-size: x-large;">
         <h1>
-            <b id="state" style="display: inline-block; margin-left: 50px; margin-right:50px;">Click for matching</b>
+            <b id="state" style="display: inline-block; margin-left: 50px; margin-right:50px;color: white;
+            text-shadow: 1px 1px 2px black, 0 0 25px blue, 0 0 5px darkblue;">Click for matching</b>
         </h1>
     </div>
 
